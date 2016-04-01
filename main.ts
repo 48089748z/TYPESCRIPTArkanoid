@@ -85,7 +85,6 @@ class mainState extends Phaser.State
         this.physics.enable(this.playerPaddle);
         this.playerPaddle.x = this.world.centerX;
         this.playerPaddle.y = this.world.height - this.playerPaddle.height;
-        this.playerPaddle.body.collideWorldBounds = true;
         this.playerPaddle.body.bounce.setTo(0);
         this.playerPaddle.body.immovable = true;
     }
