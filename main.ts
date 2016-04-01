@@ -39,6 +39,11 @@ class mainState extends Phaser.State
         this.physics.arcade.collide(this.playerPaddle, this.ball);
         this.physics.arcade.collide(this.ball, this.elements, this.killElement, null, this);
         this.playerPaddle.position.x = this.game.input.x;
+        if (this.elements.countLiving()==0)
+        {
+            this.information.setText(' YOU HAVE WON THE GAME!\n You get extra 100 score/live\n YOUR FINAL SCORE IS: '+this.score+this.lives*100+"\n\n CLICK ANYWHERE TO RESTART");
+            this.input.onTap.addOnce(this.restart, this);
+        }
     }
     private killElement(ball:Phaser.Sprite, element:Phaser.Sprite)
     {
@@ -48,10 +53,9 @@ class mainState extends Phaser.State
     }
     configMAP()
     {
-        this.physics.arcade.checkCollision.down = false;
+      //  this.physics.arcade.checkCollision.down = false;
         this.game.stage.backgroundColor = "#6E6E6E";
-
-        this.information = this.add.text(this.world.centerX, this.world.centerY, '', {font: "40px Arial", fill: "#ffffff"});
+        this.information = this.add.text(this.world.centerX-300, this.world.centerY, '', {font: "40px Arial", fill: "#ffffff"});
         this.information.fixedToCamera = true;
         this.lives_text = this.add.text(0, 0, '  LIVES: ' + this.lives, {font: "40px Arial", fill: "#ffffff"});
         this.lives_text.fixedToCamera = true;
@@ -105,11 +109,10 @@ class mainState extends Phaser.State
         this.lives_text.setText('  LIVES: ' + this.lives);
         if (this.lives == 0)
         {
-            this.information.setText(' YOU HAVE LOST! \nCLICK TO RESTART');
+            this.information.setText(' YOU HAVE LOST! \nCLICK ANYWHERE TO RESTART');
             this.input.onTap.addOnce(this.restart, this);
         }
         else {this.configBALL();}
-
     }
     restart() {
         this.lives = 3;
