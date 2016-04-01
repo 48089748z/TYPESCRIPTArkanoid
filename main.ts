@@ -6,6 +6,7 @@ class mainState extends Phaser.State
     private ball:Phaser.Sprite;
     private elements:Phaser.Group;
 
+    private information:Phaser.Text;
     private score = 0;
     private score_text:Phaser.Text;
     private lives = 3;
@@ -29,7 +30,8 @@ class mainState extends Phaser.State
         super.create();
         this.configMAP();
         this.configELEMENTS();
-        this.configPADDLEBALL();
+        this.configPADDLE();
+        this.configBALL();
     }
     update():void
     {
@@ -46,10 +48,14 @@ class mainState extends Phaser.State
     }
     configMAP()
     {
+        this.physics.arcade.checkCollision.down = false;
         this.game.stage.backgroundColor = "#6E6E6E";
-        this.lives_text = this.add.text(0, 0, 'LIVES: ' + this.lives, {font: "40px Arial", fill: "#ffffff"});
-        this.score_text = this.add.text(this.world.centerX,0, 'SCORE: ' + this.score, {font: "40px Arial", fill: "#ffffff"});
+
+        this.information = this.add.text(this.world.centerX, this.world.centerY, '', {font: "40px Arial", fill: "#ffffff"});
+        this.information.fixedToCamera = true;
+        this.lives_text = this.add.text(0, 0, '  LIVES: ' + this.lives, {font: "40px Arial", fill: "#ffffff"});
         this.lives_text.fixedToCamera = true;
+        this.score_text = this.add.text(this.world.centerX,0, 'SCORE: ' + this.score, {font: "40px Arial", fill: "#ffffff"});
         this.score_text.fixedToCamera = true;
     }
     configELEMENTS()
@@ -69,7 +75,7 @@ class mainState extends Phaser.State
             }
         }
     }
-    configPADDLEBALL()
+    configPADDLE()
     {
         this.playerPaddle = this.add.sprite(this.world.centerX, 0, 'playerPaddle');
         this.physics.enable(this.playerPaddle);
@@ -78,8 +84,9 @@ class mainState extends Phaser.State
         this.playerPaddle.body.collideWorldBounds = true;
         this.playerPaddle.body.bounce.setTo(0);
         this.playerPaddle.body.immovable = true;
-
-
+    }
+    configBALL()
+    {
         this.ball = this.add.sprite(this.world.centerX, 500, 'ball');
         this.physics.enable(this.ball);
         this.ball.x =this.world.centerX;
@@ -88,6 +95,26 @@ class mainState extends Phaser.State
         this.ball.body.velocity.x = this.BALL_CONSTANT_SPEED;
         this.ball.body.velocity.y = this.BALL_CONSTANT_SPEED;
         this.ball.body.bounce.setTo(1);
+        this.ball.checkWorldBounds = true;
+        this.ball.events.onOutOfBounds.add(this.killBall, this);
+    }
+    killBall(ball:Phaser.Sprite)
+    {
+        ball.kill();
+        this.lives = this.lives - 1;
+        this.lives_text.setText('  LIVES: ' + this.lives);
+        if (this.lives == 0)
+        {
+            this.information.setText(' YOU HAVE LOST! \nCLICK TO RESTART');
+            this.input.onTap.addOnce(this.restart, this);
+        }
+        else {this.configBALL();}
+
+    }
+    restart() {
+        this.lives = 3;
+        this.score = 0;
+        this.game.state.restart();
     }
 }
 
@@ -103,7 +130,7 @@ class Elemento extends Phaser.Sprite
 class Arkanoid {
     game:Phaser.Game;
     constructor() {
-        this.game = new Phaser.Game(1000, 700, Phaser.AUTO, 'gameDiv');
+        this.game = new Phaser.Game(980, 700, Phaser.AUTO, 'gameDiv');
         this.game.state.add('main', mainState);
         this.game.state.start('main');
     }

@@ -27,7 +27,8 @@ var mainState = (function (_super) {
         _super.prototype.create.call(this);
         this.configMAP();
         this.configELEMENTS();
-        this.configPADDLEBALL();
+        this.configPADDLE();
+        this.configBALL();
     };
     mainState.prototype.update = function () {
         _super.prototype.update.call(this);
@@ -41,10 +42,13 @@ var mainState = (function (_super) {
         this.score_text.setText("SCORE: " + this.score);
     };
     mainState.prototype.configMAP = function () {
+        this.physics.arcade.checkCollision.down = false;
         this.game.stage.backgroundColor = "#6E6E6E";
-        this.lives_text = this.add.text(0, 0, 'LIVES: ' + this.lives, { font: "40px Arial", fill: "#ffffff" });
-        this.score_text = this.add.text(this.world.centerX, 0, 'SCORE: ' + this.score, { font: "40px Arial", fill: "#ffffff" });
+        this.information = this.add.text(this.world.centerX, this.world.centerY, '', { font: "40px Arial", fill: "#ffffff" });
+        this.information.fixedToCamera = true;
+        this.lives_text = this.add.text(0, 0, '  LIVES: ' + this.lives, { font: "40px Arial", fill: "#ffffff" });
         this.lives_text.fixedToCamera = true;
+        this.score_text = this.add.text(this.world.centerX, 0, 'SCORE: ' + this.score, { font: "40px Arial", fill: "#ffffff" });
         this.score_text.fixedToCamera = true;
     };
     mainState.prototype.configELEMENTS = function () {
@@ -65,7 +69,7 @@ var mainState = (function (_super) {
             }
         }
     };
-    mainState.prototype.configPADDLEBALL = function () {
+    mainState.prototype.configPADDLE = function () {
         this.playerPaddle = this.add.sprite(this.world.centerX, 0, 'playerPaddle');
         this.physics.enable(this.playerPaddle);
         this.playerPaddle.x = this.world.centerX;
@@ -73,6 +77,8 @@ var mainState = (function (_super) {
         this.playerPaddle.body.collideWorldBounds = true;
         this.playerPaddle.body.bounce.setTo(0);
         this.playerPaddle.body.immovable = true;
+    };
+    mainState.prototype.configBALL = function () {
         this.ball = this.add.sprite(this.world.centerX, 500, 'ball');
         this.physics.enable(this.ball);
         this.ball.x = this.world.centerX;
@@ -81,6 +87,25 @@ var mainState = (function (_super) {
         this.ball.body.velocity.x = this.BALL_CONSTANT_SPEED;
         this.ball.body.velocity.y = this.BALL_CONSTANT_SPEED;
         this.ball.body.bounce.setTo(1);
+        this.ball.checkWorldBounds = true;
+        this.ball.events.onOutOfBounds.add(this.killBall, this);
+    };
+    mainState.prototype.killBall = function (ball) {
+        ball.kill();
+        this.lives = this.lives - 1;
+        this.lives_text.setText('  LIVES: ' + this.lives);
+        if (this.lives == 0) {
+            this.information.setText(' YOU HAVE LOST! \nCLICK TO RESTART');
+            this.input.onTap.addOnce(this.restart, this);
+        }
+        else {
+            this.configBALL();
+        }
+    };
+    mainState.prototype.restart = function () {
+        this.lives = 3;
+        this.score = 0;
+        this.game.state.restart();
     };
     return mainState;
 })(Phaser.State);
@@ -95,7 +120,7 @@ var Elemento = (function (_super) {
 })(Phaser.Sprite);
 var Arkanoid = (function () {
     function Arkanoid() {
-        this.game = new Phaser.Game(1000, 700, Phaser.AUTO, 'gameDiv');
+        this.game = new Phaser.Game(980, 700, Phaser.AUTO, 'gameDiv');
         this.game.state.add('main', mainState);
         this.game.state.start('main');
     }
