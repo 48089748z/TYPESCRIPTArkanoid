@@ -46,7 +46,7 @@ var mainState = (function (_super) {
         this.score_text.setText("SCORE: " + this.score);
     };
     mainState.prototype.configMAP = function () {
-        //  this.physics.arcade.checkCollision.down = false;
+        this.physics.arcade.checkCollision.down = false;
         this.game.stage.backgroundColor = "#6E6E6E";
         this.information = this.add.text(this.world.centerX - 300, this.world.centerY, '', { font: "40px Arial", fill: "#ffffff" });
         this.information.fixedToCamera = true;

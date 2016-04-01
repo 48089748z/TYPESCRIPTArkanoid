@@ -53,7 +53,7 @@ class mainState extends Phaser.State
     }
     configMAP()
     {
-      //  this.physics.arcade.checkCollision.down = false;
+        this.physics.arcade.checkCollision.down = false;
         this.game.stage.backgroundColor = "#6E6E6E";
         this.information = this.add.text(this.world.centerX-300, this.world.centerY, '', {font: "40px Arial", fill: "#ffffff"});
         this.information.fixedToCamera = true;
