@@ -12,7 +12,8 @@ class mainState extends Phaser.State
     private lives = 3;
     private lives_text:Phaser.Text;
 
-    private BALL_CONSTANT_SPEED = 250;
+    private BALL_START_SPEED = 200;
+    private BALL_MAX_SPEED = 600;
     private HORIZONTAL_SPACE_BETWEEN_ELEMENTS = 100;
     private VERTICAL_SPACE_BETWEEN_ELEMENTS = 60;
     preload():void
@@ -24,7 +25,6 @@ class mainState extends Phaser.State
         this.load.image('ball',         'assets/png/ballBlue.png');
         this.physics.startSystem(Phaser.Physics.ARCADE);
     }
-
     create():void
     {
         super.create();
@@ -36,7 +36,7 @@ class mainState extends Phaser.State
     update():void
     {
         super.update();
-        this.physics.arcade.collide(this.playerPaddle, this.ball);
+        this.physics.arcade.collide(this.playerPaddle, this.ball, this.speedUpBall, null, this);
         this.physics.arcade.collide(this.ball, this.elements, this.killElement, null, this);
         this.playerPaddle.position.x = this.game.input.x;
         if (this.elements.countLiving()==0)
@@ -50,6 +50,14 @@ class mainState extends Phaser.State
         element.kill();
         this.score = this.score + 10;
         this.score_text.setText("SCORE: "+this.score);
+    }
+    private speedUpBall(playerPaddle:Phaser.Sprite, ball:Phaser.Sprite)
+    {
+        if (this.ball.body.velocity.x<this.BALL_MAX_SPEED)
+        {
+            this.ball.body.velocity.x = this.ball.body.velocity.x+10;
+            this.ball.body.velocity.y = this.ball.body.velocity.y+10;
+        }
     }
     configMAP()
     {
@@ -70,10 +78,9 @@ class mainState extends Phaser.State
         {
             for (var column = 0; column < 10; column++) //Y 10 COLUMNAS
             {
-                var colour;
-                if (line % 2 == 0){colour = 'red_element'}
-                else{colour = 'blue_element'}
-                var newElement = new Elemento(this.game, this.HORIZONTAL_SPACE_BETWEEN_ELEMENTS*column, line*this.VERTICAL_SPACE_BETWEEN_ELEMENTS+50, colour, 0);
+                var COLOUR;
+                if (line % 2 == 0){COLOUR = 'red_element'} else{COLOUR = 'blue_element'}
+                var newElement = new Elemento(this.game, this.HORIZONTAL_SPACE_BETWEEN_ELEMENTS*column, line*this.VERTICAL_SPACE_BETWEEN_ELEMENTS+50, COLOUR, 0);
                 this.add.existing(newElement);
                 this.elements.add(newElement);
             }
@@ -95,8 +102,8 @@ class mainState extends Phaser.State
         this.ball.x =this.world.centerX;
         this.ball.y =  this.world.centerY;
         this.ball.body.collideWorldBounds = true;
-        this.ball.body.velocity.x = this.BALL_CONSTANT_SPEED;
-        this.ball.body.velocity.y = this.BALL_CONSTANT_SPEED;
+        this.ball.body.velocity.x = this.BALL_START_SPEED;
+        this.ball.body.velocity.y = this.BALL_START_SPEED;
         this.ball.body.bounce.setTo(1);
         this.ball.checkWorldBounds = true;
         this.ball.events.onOutOfBounds.add(this.killBall, this);
@@ -108,7 +115,7 @@ class mainState extends Phaser.State
         this.lives_text.setText('  LIVES: ' + this.lives);
         if (this.lives == 0)
         {
-            this.information.setText(' YOU HAVE LOST! \nCLICK ANYWHERE TO RESTART');
+            this.information.setText(' GAME OVER! \nCLICK ANYWHERE TO RESTART');
             this.input.onTap.addOnce(this.restart, this);
         }
         else {this.configBALL();}

@@ -11,7 +11,8 @@ var mainState = (function (_super) {
         _super.apply(this, arguments);
         this.score = 0;
         this.lives = 3;
-        this.BALL_CONSTANT_SPEED = 250;
+        this.BALL_START_SPEED = 200;
+        this.BALL_MAX_SPEED = 600;
         this.HORIZONTAL_SPACE_BETWEEN_ELEMENTS = 100;
         this.VERTICAL_SPACE_BETWEEN_ELEMENTS = 60;
     }
@@ -32,7 +33,7 @@ var mainState = (function (_super) {
     };
     mainState.prototype.update = function () {
         _super.prototype.update.call(this);
-        this.physics.arcade.collide(this.playerPaddle, this.ball);
+        this.physics.arcade.collide(this.playerPaddle, this.ball, this.speedUpBall, null, this);
         this.physics.arcade.collide(this.ball, this.elements, this.killElement, null, this);
         this.playerPaddle.position.x = this.game.input.x;
         if (this.elements.countLiving() == 0) {
@@ -44,6 +45,12 @@ var mainState = (function (_super) {
         element.kill();
         this.score = this.score + 10;
         this.score_text.setText("SCORE: " + this.score);
+    };
+    mainState.prototype.speedUpBall = function (playerPaddle, ball) {
+        if (this.ball.body.velocity.x < this.BALL_MAX_SPEED) {
+            this.ball.body.velocity.x = this.ball.body.velocity.x + 10;
+            this.ball.body.velocity.y = this.ball.body.velocity.y + 10;
+        }
     };
     mainState.prototype.configMAP = function () {
         this.physics.arcade.checkCollision.down = false;
@@ -60,14 +67,14 @@ var mainState = (function (_super) {
         this.elements.enableBody = true;
         for (var line = 0; line < 5; line++) {
             for (var column = 0; column < 10; column++) {
-                var colour;
+                var COLOUR;
                 if (line % 2 == 0) {
-                    colour = 'red_element';
+                    COLOUR = 'red_element';
                 }
                 else {
-                    colour = 'blue_element';
+                    COLOUR = 'blue_element';
                 }
-                var newElement = new Elemento(this.game, this.HORIZONTAL_SPACE_BETWEEN_ELEMENTS * column, line * this.VERTICAL_SPACE_BETWEEN_ELEMENTS + 50, colour, 0);
+                var newElement = new Elemento(this.game, this.HORIZONTAL_SPACE_BETWEEN_ELEMENTS * column, line * this.VERTICAL_SPACE_BETWEEN_ELEMENTS + 50, COLOUR, 0);
                 this.add.existing(newElement);
                 this.elements.add(newElement);
             }
@@ -87,8 +94,8 @@ var mainState = (function (_super) {
         this.ball.x = this.world.centerX;
         this.ball.y = this.world.centerY;
         this.ball.body.collideWorldBounds = true;
-        this.ball.body.velocity.x = this.BALL_CONSTANT_SPEED;
-        this.ball.body.velocity.y = this.BALL_CONSTANT_SPEED;
+        this.ball.body.velocity.x = this.BALL_START_SPEED;
+        this.ball.body.velocity.y = this.BALL_START_SPEED;
         this.ball.body.bounce.setTo(1);
         this.ball.checkWorldBounds = true;
         this.ball.events.onOutOfBounds.add(this.killBall, this);
@@ -98,7 +105,7 @@ var mainState = (function (_super) {
         this.lives = this.lives - 1;
         this.lives_text.setText('  LIVES: ' + this.lives);
         if (this.lives == 0) {
-            this.information.setText(' YOU HAVE LOST! \nCLICK ANYWHERE TO RESTART');
+            this.information.setText(' GAME OVER! \nCLICK ANYWHERE TO RESTART');
             this.input.onTap.addOnce(this.restart, this);
         }
         else {
