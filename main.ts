@@ -2,7 +2,7 @@
 import Point = Phaser.Point;
 class mainState extends Phaser.State
 {
-    private playerPaddle:Phaser.Sprite;
+    private paddle:Phaser.Sprite;
     private ball:Phaser.Sprite;
     private elements:Phaser.Group;
 
@@ -19,7 +19,7 @@ class mainState extends Phaser.State
     preload():void
     {
         super.preload();
-        this.load.image('playerPaddle', 'assets/png/paddleRed.png');
+        this.load.image('paddle', 'assets/png/paddleRed.png');
         this.load.image('blue_element', 'assets/png/element_blue_rectangle_glossy.png');
         this.load.image('red_element',  'assets/png/element_red_rectangle_glossy.png');
         this.load.image('ball',         'assets/png/ballBlue.png');
@@ -36,9 +36,9 @@ class mainState extends Phaser.State
     update():void
     {
         super.update();
-        this.physics.arcade.collide(this.playerPaddle, this.ball, this.speedUpBall, null, this);
+        this.physics.arcade.collide(this.paddle, this.ball, this.speedUpBall, null, this);
         this.physics.arcade.collide(this.ball, this.elements, this.killElement, null, this);
-        this.playerPaddle.position.x = this.game.input.x;
+        this.paddle.position.x = this.game.input.x;
         if (this.elements.countLiving()==0)
         {
             this.information.setText(' YOU HAVE WON THE GAME!\n You get extra 100 score/live\n YOUR FINAL SCORE IS: '+this.score+this.lives*100+"\n\n CLICK ANYWHERE TO RESTART");
@@ -55,8 +55,8 @@ class mainState extends Phaser.State
     {
         if (this.ball.body.velocity.x<this.BALL_MAX_SPEED)
         {
-            this.ball.body.velocity.x = this.ball.body.velocity.x+10;
-            this.ball.body.velocity.y = this.ball.body.velocity.y+10;
+            this.ball.body.velocity.x = this.ball.body.velocity.x+30;
+            this.ball.body.velocity.y = this.ball.body.velocity.y+30;
         }
     }
     configMAP()
@@ -88,12 +88,12 @@ class mainState extends Phaser.State
     }
     configPADDLE()
     {
-        this.playerPaddle = this.add.sprite(this.world.centerX, 0, 'playerPaddle');
-        this.physics.enable(this.playerPaddle);
-        this.playerPaddle.x = this.world.centerX;
-        this.playerPaddle.y = this.world.height - this.playerPaddle.height;
-        this.playerPaddle.body.bounce.setTo(0);
-        this.playerPaddle.body.immovable = true;
+        this.paddle = this.add.sprite(this.world.centerX, 0, 'paddle');
+        this.physics.enable(this.paddle);
+        this.paddle.x = this.world.centerX;
+        this.paddle.y = this.world.height - this.paddle.height;
+        this.paddle.body.bounce.setTo(0);
+        this.paddle.body.immovable = true;
     }
     configBALL()
     {
@@ -120,7 +120,8 @@ class mainState extends Phaser.State
         }
         else {this.configBALL();}
     }
-    restart() {
+    restart()
+    {
         this.lives = 3;
         this.score = 0;
         this.game.state.restart();
