@@ -11,10 +11,12 @@ var mainState = (function (_super) {
         _super.apply(this, arguments);
         this.score = 0;
         this.lives = 3;
-        this.BALL_START_SPEED = 200;
-        this.BALL_MAX_SPEED = 600;
+        this.BALL_START_SPEED = 250;
+        this.BALL_MAX_SPEED = 800;
         this.HORIZONTAL_SPACE_BETWEEN_ELEMENTS = 100;
         this.VERTICAL_SPACE_BETWEEN_ELEMENTS = 60;
+        this.SPACE_UNDER_PADDLE = 15;
+        this.SCORE_FOR_POWER_UP = 100;
     }
     mainState.prototype.preload = function () {
         _super.prototype.preload.call(this);
@@ -22,6 +24,7 @@ var mainState = (function (_super) {
         this.load.image('blue_element', 'assets/png/element_blue_rectangle_glossy.png');
         this.load.image('red_element', 'assets/png/element_red_rectangle_glossy.png');
         this.load.image('ball', 'assets/png/ballBlue.png');
+        this.load.image('star', 'assets/png/particleStar.png');
         this.physics.startSystem(Phaser.Physics.ARCADE);
     };
     mainState.prototype.create = function () {
@@ -38,8 +41,16 @@ var mainState = (function (_super) {
         this.paddle.position.x = this.game.input.x;
         if (this.elements.countLiving() == 0) {
             this.information.setText(' YOU HAVE WON THE GAME!\n You get extra 100 score/live\n YOUR FINAL SCORE IS: ' + this.score + this.lives * 100 + "\n\n CLICK ANYWHERE TO RESTART");
-            this.input.onTap.addOnce(this.restart, this);
+            this.input.onTap.addOnce(this.restart);
         }
+        if (this.score <= this.SCORE_FOR_POWER_UP) {
+            this.input.onTap.addOnce(this.shoot, this);
+        }
+    };
+    mainState.prototype.shoot = function () {
+        //this.star = this.add.sprite(this.world.centerX, this.world.centerY, 'star');
+        //this.physics.enable(this.star);
+        this.information.setText('asdfgsdg');
     };
     mainState.prototype.killElement = function (ball, element) {
         element.kill();
@@ -48,8 +59,8 @@ var mainState = (function (_super) {
     };
     mainState.prototype.speedUpBall = function (playerPaddle, ball) {
         if (this.ball.body.velocity.x < this.BALL_MAX_SPEED) {
-            this.ball.body.velocity.x = this.ball.body.velocity.x + 30;
-            this.ball.body.velocity.y = this.ball.body.velocity.y + 30;
+            this.ball.body.velocity.x = this.ball.body.velocity.x + 25;
+            this.ball.body.velocity.y = this.ball.body.velocity.y + 25;
         }
     };
     mainState.prototype.configMAP = function () {
@@ -83,9 +94,7 @@ var mainState = (function (_super) {
     mainState.prototype.configPADDLE = function () {
         this.paddle = this.add.sprite(this.world.centerX, 0, 'paddle');
         this.physics.enable(this.paddle);
-        this.paddle.x = this.world.centerX;
-        this.paddle.y = this.world.height - this.paddle.height;
-        this.paddle.body.bounce.setTo(0);
+        this.paddle.y = this.world.height - this.paddle.height - this.SPACE_UNDER_PADDLE;
         this.paddle.body.immovable = true;
     };
     mainState.prototype.configBALL = function () {

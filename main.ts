@@ -5,6 +5,7 @@ class mainState extends Phaser.State
     private paddle:Phaser.Sprite;
     private ball:Phaser.Sprite;
     private elements:Phaser.Group;
+    private star: Phaser.Sprite;
 
     private information:Phaser.Text;
     private score = 0;
@@ -12,10 +13,13 @@ class mainState extends Phaser.State
     private lives = 3;
     private lives_text:Phaser.Text;
 
-    private BALL_START_SPEED = 200;
-    private BALL_MAX_SPEED = 600;
+    private BALL_START_SPEED = 250;
+    private BALL_MAX_SPEED = 800;
     private HORIZONTAL_SPACE_BETWEEN_ELEMENTS = 100;
     private VERTICAL_SPACE_BETWEEN_ELEMENTS = 60;
+    private SPACE_UNDER_PADDLE = 15;
+    private SCORE_FOR_POWER_UP = 100;
+
     preload():void
     {
         super.preload();
@@ -23,6 +27,7 @@ class mainState extends Phaser.State
         this.load.image('blue_element', 'assets/png/element_blue_rectangle_glossy.png');
         this.load.image('red_element',  'assets/png/element_red_rectangle_glossy.png');
         this.load.image('ball',         'assets/png/ballBlue.png');
+        this.load.image('star',         'assets/png/particleStar.png');
         this.physics.startSystem(Phaser.Physics.ARCADE);
     }
     create():void
@@ -42,8 +47,18 @@ class mainState extends Phaser.State
         if (this.elements.countLiving()==0)
         {
             this.information.setText(' YOU HAVE WON THE GAME!\n You get extra 100 score/live\n YOUR FINAL SCORE IS: '+this.score+this.lives*100+"\n\n CLICK ANYWHERE TO RESTART");
-            this.input.onTap.addOnce(this.restart, this);
+            this.input.onTap.addOnce(this.restart);
         }
+        if (this.score<=this.SCORE_FOR_POWER_UP)
+        {
+            this.input.onTap.addOnce(this.shoot, this);
+        }
+    }
+    private shoot()
+    {
+        //this.star = this.add.sprite(this.world.centerX, this.world.centerY, 'star');
+        //this.physics.enable(this.star);
+        this.information.setText('asdfgsdg');
     }
     private killElement(ball:Phaser.Sprite, element:Phaser.Sprite)
     {
@@ -55,8 +70,8 @@ class mainState extends Phaser.State
     {
         if (this.ball.body.velocity.x<this.BALL_MAX_SPEED)
         {
-            this.ball.body.velocity.x = this.ball.body.velocity.x+30;
-            this.ball.body.velocity.y = this.ball.body.velocity.y+30;
+            this.ball.body.velocity.x = this.ball.body.velocity.x+25;
+            this.ball.body.velocity.y = this.ball.body.velocity.y+25;
         }
     }
     configMAP()
@@ -90,9 +105,7 @@ class mainState extends Phaser.State
     {
         this.paddle = this.add.sprite(this.world.centerX, 0, 'paddle');
         this.physics.enable(this.paddle);
-        this.paddle.x = this.world.centerX;
-        this.paddle.y = this.world.height - this.paddle.height;
-        this.paddle.body.bounce.setTo(0);
+        this.paddle.y = this.world.height - this.paddle.height - this.SPACE_UNDER_PADDLE;
         this.paddle.body.immovable = true;
     }
     configBALL()
