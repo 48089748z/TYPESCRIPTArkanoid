@@ -50,7 +50,6 @@ var mainState = (function (_super) {
     mainState.prototype.shoot = function () {
         //this.star = this.add.sprite(this.world.centerX, this.world.centerY, 'star');
         //this.physics.enable(this.star);
-        this.information.setText('asdfgsdg');
     };
     mainState.prototype.killElement = function (ball, element) {
         element.kill();

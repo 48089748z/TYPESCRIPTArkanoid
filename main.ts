@@ -58,7 +58,6 @@ class mainState extends Phaser.State
     {
         //this.star = this.add.sprite(this.world.centerX, this.world.centerY, 'star');
         //this.physics.enable(this.star);
-        this.information.setText('asdfgsdg');
     }
     private killElement(ball:Phaser.Sprite, element:Phaser.Sprite)
     {
